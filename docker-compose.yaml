@@ -58,7 +58,7 @@ services:
     ports:
       - 5000:5000
     environment:
-      - CTF_IPPATTERN=10.10.%s.1
+      - CTF_IPPATTERN=172.16.%s.1
 
   gameserver-scoreboard:
     build:
@@ -118,9 +118,9 @@ services:
       - CTF_METRICS_LISTEN=0.0.0.0:9100
 
   gameserver-checker-example:
-    image: wert310/gameserver-basechecker:latest
+    image: wert310/gameserver-basechecker:ef3af01
     build:
-      context: .
+      context: ./aquaeducts-checker
       dockerfile: Dockerfile
       target: checkerbase
     depends_on:
@@ -131,7 +131,7 @@ services:
     networks:
       - gameserver
     volumes:
-      - ./examples/checker/true.py:/etc/ctf-gameserver/example_checker.py
+      - ./checker.py:/etc/ctf-gameserver/checker.py
     user: ctf-checkermaster
     environment:
       - CTF_LOGLEVEL=INFO
@@ -141,12 +141,12 @@ services:
       - CTF_DBPASSWORD=9iyzXY6pMYzRvXZi
       - CTF_METRICS_LISTEN=0.0.0.0:9101
       - CTF_SUDOUSER=ctf-checkerrunner
-      - CTF_IPPATTERN=10.10.%s.1
+      - CTF_IPPATTERN=172.16.%s.1
       - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
       # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
       # Service specific
       - CTF_SERVICE=service1_checker1
-      - CTF_CHECKERSCRIPT=/etc/ctf-gameserver/example_checker.py
+      - CTF_CHECKERSCRIPT=/etc/ctf-gameserver/checker.py
       - CTF_CHECKERCOUNT=1
       - CTF_INTERVAL=10
 
