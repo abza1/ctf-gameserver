@@ -120,7 +120,7 @@ services:
   gameserver-checker-example:
     image: wert310/gameserver-basechecker:ef3af01
     build:
-      context: ./aquaeducts-checker
+      context: ./aquaeductus-checker
       dockerfile: Dockerfile
       target: checkerbase
     depends_on:
