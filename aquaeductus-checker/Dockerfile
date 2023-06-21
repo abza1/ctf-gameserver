@@ -1,6 +1,6 @@
 FROM wert310/gameserver-basechecker:ef3af01
 
-RUN mkdir -p /checker
+RUN mkdssir -p /checker
 WORKDIR /checker
 
 COPY requirements.txt /checker/requirements.txt
@@ -13,4 +13,4 @@ USER ctf-checkermaster
 ENV CTF_CHECKERSCRIPT /checker/checker.py
 
 # set this to <yourchallengename>_checker<X>
-ENV CTF_SERVICE aquaeductus_checker1
+ENV CTF_SERVICE service1_checker1

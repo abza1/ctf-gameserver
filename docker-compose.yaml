@@ -58,7 +58,7 @@ services:
     ports:
       - 5000:5000
     environment:
-      - CTF_IPPATTERN=172.16.%s.1
+      - CTF_IPPATTERN=172.16.%s.62
 
   gameserver-scoreboard:
     build:
@@ -118,9 +118,9 @@ services:
       - CTF_METRICS_LISTEN=0.0.0.0:9100
 
   gameserver-checker-example:
-    image: wert310/gameserver-basechecker:ef3af01
+    #image: wert310/gameserver-basechecker:latest
     build:
-      context: ./aquaeductus-checker
+      context: .
       dockerfile: Dockerfile
       target: checkerbase
     depends_on:
@@ -131,22 +131,56 @@ services:
     networks:
       - gameserver
     volumes:
-      - ./checker.py:/etc/ctf-gameserver/checker.py
+      - ./aquaeductus-checker/checker.py:/checker/checker.py
     user: ctf-checkermaster
     environment:
-      - CTF_LOGLEVEL=INFO
+      - CTF_LOGLEVEL=DEBUG
       - CTF_DBHOST=gameserver-postgres
       - CTF_DBNAME=ctf-gameserver
       - CTF_DBUSER=ctf-gameserver
       - CTF_DBPASSWORD=9iyzXY6pMYzRvXZi
       - CTF_METRICS_LISTEN=0.0.0.0:9101
       - CTF_SUDOUSER=ctf-checkerrunner
-      - CTF_IPPATTERN=172.16.%s.1
+      - CTF_IPPATTERN=172.16.%s.62
       - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
       # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
       # Service specific
       - CTF_SERVICE=service1_checker1
-      - CTF_CHECKERSCRIPT=/etc/ctf-gameserver/checker.py
+      - CTF_CHECKERSCRIPT=/checker/checker.py
       - CTF_CHECKERCOUNT=1
       - CTF_INTERVAL=10
 
+  #gameserver-checker-example-100:
+  #  image: wert310/gameserver-basechecker:ef3af01
+  #  build:
+  #    context: .
+  #    dockerfile: Dockerfile
+  #    target: checkerbase
+  #  depends_on:
+  #    - gameserver-postgres
+  #  restart: on-failure
+  #  ports:
+  #    - 9101:9101
+  #  networks:
+  #    - gameserver
+  #  volumes:
+  #    - ./aquaeductus-checker/checker.py:/checker/checker.py
+  #  user: ctf-checkermaster
+  #  environment:
+  #    - CTF_LOGLEVEL=DEBUG
+  #    - CTF_DBHOST=gameserver-postgres
+  #    - CTF_DBNAME=ctf-gameserver
+  #    - CTF_DBUSER=ctf-gameserver
+  #    - CTF_DBPASSWORD=9iyzXY6pMYzRvXZi
+  #    - CTF_METRICS_LISTEN=0.0.0.0:9101
+  #    - CTF_SUDOUSER=ctf-checkerrunner
+  #    - CTF_IPPATTERN=172.16.%s.1
+  #    - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
+  #    # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
+  #    # Service specific
+  #    - CTF_SERVICE=service1_checker1
+  #    - CTF_CHECKERSCRIPT=/checker/checker.py
+  #    - CTF_CHECKERCOUNT=1
+  #    - CTF_INTERVAL=10
+#
+#
