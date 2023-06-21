@@ -120,9 +120,9 @@ services:
   aquaeductus-checker-service:
     #image: wert310/gameserver-basechecker:latest
     build:
-      context: .
+      context: services-checkers/aq/checker1/.
       dockerfile: Dockerfile
-      target: aquaeductus-checker
+      #target: aquaeductus-checker
     depends_on:
       - gameserver-postgres
     restart: on-failure
@@ -130,11 +130,11 @@ services:
       - 9101:9101
     networks:
       - gameserver
-    volumes:
-      - ./checkers/aquaeductus-checker/checker.py:/checker/checker.py
+    #volumes:
+    #  - ./checkers/aquaeductus-checker/checker.py:/checker/checker.py
     user: ctf-checkermaster
     environment:
-      - CTF_LOGLEVEL=DEBUG
+      - CTF_LOGLEVEL=INFO
       - CTF_DBHOST=gameserver-postgres
       - CTF_DBNAME=ctf-gameserver
       - CTF_DBUSER=ctf-gameserver
@@ -145,8 +145,242 @@ services:
       - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
       # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
       # Service specific
-      - CTF_SERVICE=service1_checker1
+      - CTF_SERVICE=aquaeductus_checker1
       - CTF_CHECKERSCRIPT=/checker/checker.py
       - CTF_CHECKERCOUNT=1
       - CTF_INTERVAL=10
 
+  blinkygram-checker1-service:
+    #image: wert310/gameserver-basechecker:latest
+    build:
+      context: services-checkers/bl/checker1/.
+      dockerfile: Dockerfile
+      #target: aquaeductus-checker
+    depends_on:
+      - gameserver-postgres
+    restart: on-failure
+    ports:
+      - 9102:9101
+    networks:
+      - gameserver
+    #volumes:
+    #  - ./checkers/aquaeductus-checker/checker.py:/checker/checker.py
+    user: ctf-checkermaster
+    environment:
+      - CTF_LOGLEVEL=INFO
+      - CTF_DBHOST=gameserver-postgres
+      - CTF_DBNAME=ctf-gameserver
+      - CTF_DBUSER=ctf-gameserver
+      - CTF_DBPASSWORD=9iyzXY6pMYzRvXZi
+      - CTF_METRICS_LISTEN=0.0.0.0:9101
+      - CTF_SUDOUSER=ctf-checkerrunner
+      - CTF_IPPATTERN=172.16.%s.62
+      - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
+      # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
+      # Service specific
+      - CTF_SERVICE=blinkygram_checker1
+      - CTF_CHECKERSCRIPT=/checker/checker.py
+      - CTF_CHECKERCOUNT=1
+      - CTF_INTERVAL=10
+
+  blinkygram-checker2-service:
+    #image: wert310/gameserver-basechecker:latest
+    build:
+      context: services-checkers/bl/checker2/.
+      dockerfile: Dockerfile
+      #target: aquaeductus-checker
+    depends_on:
+      - gameserver-postgres
+    restart: on-failure
+    ports:
+      - 9103:9101
+    networks:
+      - gameserver
+    #volumes:
+    #  - ./checkers/aquaeductus-checker/checker.py:/checker/checker.py
+    user: ctf-checkermaster
+    environment:
+      - CTF_LOGLEVEL=INFO
+      - CTF_DBHOST=gameserver-postgres
+      - CTF_DBNAME=ctf-gameserver
+      - CTF_DBUSER=ctf-gameserver
+      - CTF_DBPASSWORD=9iyzXY6pMYzRvXZi
+      - CTF_METRICS_LISTEN=0.0.0.0:9101
+      - CTF_SUDOUSER=ctf-checkerrunner
+      - CTF_IPPATTERN=172.16.%s.62
+      - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
+      # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
+      # Service specific
+      - CTF_SERVICE=blinkygram_checker2
+      - CTF_CHECKERSCRIPT=/checker/checker.py
+      - CTF_CHECKERCOUNT=1
+      - CTF_INTERVAL=10
+
+  cantina-checker-service:
+    #image: wert310/gameserver-basechecker:latest
+    build:
+      context: services-checkers/ca/.
+      dockerfile: checker1/Dockerfile
+      #target: aquaeductus-checker
+    depends_on:
+      - gameserver-postgres
+    restart: on-failure
+    ports:
+      - 9104:9101
+    networks:
+      - gameserver
+    #volumes:
+    #  - ./checkers/aquaeductus-checker/checker.py:/checker/checker.py
+    user: ctf-checkermaster
+    environment:
+      - CTF_LOGLEVEL=INFO
+      - CTF_DBHOST=gameserver-postgres
+      - CTF_DBNAME=ctf-gameserver
+      - CTF_DBUSER=ctf-gameserver
+      - CTF_DBPASSWORD=9iyzXY6pMYzRvXZi
+      - CTF_METRICS_LISTEN=0.0.0.0:9101
+      - CTF_SUDOUSER=ctf-checkerrunner
+      - CTF_IPPATTERN=172.16.%s.62
+      - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
+      # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
+      # Service specific
+      - CTF_SERVICE=cantina_checker1
+      - CTF_CHECKERSCRIPT=/checker/checker.py
+      - CTF_CHECKERCOUNT=1
+      - CTF_INTERVAL=10
+
+
+  dewaste-checker-service:
+    #image: wert310/gameserver-basechecker:latest
+    build:
+      context: services-checkers/de/checker1
+      dockerfile: Dockerfile
+      #target: aquaeductus-checker
+    depends_on:
+      - gameserver-postgres
+    restart: on-failure
+    ports:
+      - 9105:9101
+    networks:
+      - gameserver
+    #volumes:
+    #  - ./checkers/aquaeductus-checker/checker.py:/checker/checker.py
+    user: ctf-checkermaster
+    environment:
+      - CTF_LOGLEVEL=INFO
+      - CTF_DBHOST=gameserver-postgres
+      - CTF_DBNAME=ctf-gameserver
+      - CTF_DBUSER=ctf-gameserver
+      - CTF_DBPASSWORD=9iyzXY6pMYzRvXZi
+      - CTF_METRICS_LISTEN=0.0.0.0:9101
+      - CTF_SUDOUSER=ctf-checkerrunner
+      - CTF_IPPATTERN=172.16.%s.62
+      - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
+      # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
+      # Service specific
+      - CTF_SERVICE=dewaste_checker1
+      - CTF_CHECKERSCRIPT=/checker/checker.py
+      - CTF_CHECKERCOUNT=1
+      - CTF_INTERVAL=10
+
+
+  hps-checker-service:
+    #image: wert310/gameserver-basechecker:latest
+    build:
+      context: services-checkers/hp/checker1
+      dockerfile: Dockerfile
+      #target: aquaeductus-checker
+    depends_on:
+      - gameserver-postgres
+    restart: on-failure
+    ports:
+      - 9106:9101
+    networks:
+      - gameserver
+    #volumes:
+    #  - ./checkers/aquaeductus-checker/checker.py:/checker/checker.py
+    user: ctf-checkermaster
+    environment:
+      - CTF_LOGLEVEL=INFO
+      - CTF_DBHOST=gameserver-postgres
+      - CTF_DBNAME=ctf-gameserver
+      - CTF_DBUSER=ctf-gameserver
+      - CTF_DBPASSWORD=9iyzXY6pMYzRvXZi
+      - CTF_METRICS_LISTEN=0.0.0.0:9101
+      - CTF_SUDOUSER=ctf-checkerrunner
+      - CTF_IPPATTERN=172.16.%s.62
+      - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
+      # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
+      # Service specific
+      - CTF_SERVICE=hps_checker1
+      - CTF_CHECKERSCRIPT=/checker/checker.py
+      - CTF_CHECKERCOUNT=1
+      - CTF_INTERVAL=10
+
+  techbay-checker-service:
+    #image: wert310/gameserver-basechecker:latest
+    build:
+      context: services-checkers/te/checker1
+      dockerfile: Dockerfile
+      #target: aquaeductus-checker
+    depends_on:
+      - gameserver-postgres
+    restart: on-failure
+    ports:
+      - 9107:9101
+    networks:
+      - gameserver
+    #volumes:
+    #  - ./checkers/aquaeductus-checker/checker.py:/checker/checker.py
+    user: ctf-checkermaster
+    environment:
+      - CTF_LOGLEVEL=INFO
+      - CTF_DBHOST=gameserver-postgres
+      - CTF_DBNAME=ctf-gameserver
+      - CTF_DBUSER=ctf-gameserver
+      - CTF_DBPASSWORD=9iyzXY6pMYzRvXZi
+      - CTF_METRICS_LISTEN=0.0.0.0:9101
+      - CTF_SUDOUSER=ctf-checkerrunner
+      - CTF_IPPATTERN=172.16.%s.62
+      - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
+      # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
+      # Service specific
+      - CTF_SERVICE=techbay_checker1
+      - CTF_CHECKERSCRIPT=/checker/checker.py
+      - CTF_CHECKERCOUNT=1
+      - CTF_INTERVAL=10
+
+
+  windsofthepast-checker-service:
+    #image: wert310/gameserver-basechecker:latest
+    build:
+      context: services-checkers/wi/checker1
+      dockerfile: Dockerfile
+      #target: aquaeductus-checker
+    depends_on:
+      - gameserver-postgres
+    restart: on-failure
+    ports:
+      - 9108:9101
+    networks:
+      - gameserver
+    #volumes:
+    #  - ./checkers/aquaeductus-checker/checker.py:/checker/checker.py
+    user: ctf-checkermaster
+    environment:
+      - CTF_LOGLEVEL=INFO
+      - CTF_DBHOST=gameserver-postgres
+      - CTF_DBNAME=ctf-gameserver
+      - CTF_DBUSER=ctf-gameserver
+      - CTF_DBPASSWORD=9iyzXY6pMYzRvXZi
+      - CTF_METRICS_LISTEN=0.0.0.0:9101
+      - CTF_SUDOUSER=ctf-checkerrunner
+      - CTF_IPPATTERN=172.16.%s.62
+      - CTF_FLAGSECRET=KWmRQ5HxPzPeFPHu
+      # - "CTF_LOKI_URL=https://...@logs-prod-eu-west-0.grafana.net/loki/api/v1/push"
+      # Service specific
+      - CTF_SERVICE=windsOfThePast_checker1
+      - CTF_CHECKERSCRIPT=/checker/checker.py
+      - CTF_CHECKERCOUNT=1
+      - CTF_INTERVAL=10
+    

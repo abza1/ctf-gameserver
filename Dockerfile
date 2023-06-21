@@ -38,17 +38,3 @@ FROM gameserver-base as controller
 RUN useradd -m -U -s /bin/bash ctf-controller
 USER ctf-controller
 ENTRYPOINT [ "ctf-controller" ]
-
-
-FROM wert310/gameserver-basechecker:ef3af01 as aquaeductus-checker
-RUN mkdir -p /checker
-WORKDIR /checker
-COPY checkers/aquaeductus-checker/requirements.txt /checker/requirements.txt
-RUN pip install -r requirements.txt
-COPY checkers/aquaeductus-checker/checker.py /checker/checker.py
-COPY checkers/aquaeductus-checker/Network.py /checker/Network.py
-COPY checkers/aquaeductus-checker/WeatherReport.py /checker/WeatherReport.py
-USER ctf-checkermaster # do this downstream checkers
-ENV CTF_SUDOUSER ctf-checkerrunner
-
-
