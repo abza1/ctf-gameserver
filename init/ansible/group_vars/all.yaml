@@ -2,8 +2,8 @@
 competition_name: "ECSC 2022 | Attack-Defense"
 # dates in UTC, Vienna local time is 2h later
 services_public: '2022-09-04 19:00:00+00' # TODO change
-event_start:     '2023-06-21 16:53:00+00' # TODO change
-event_freeze:    '2023-09-18 19:54:00+00'
+event_start:     '2023-06-22 14:32:00+00' # TODO change
+event_freeze:    '2023-06-22 07:52:00+00'
 event_end:       '2023-09-18 19:59:00+00'
 tick_duration: 60 # TODO change
 valid_ticks: 5 # NOTE: changing this value also requires adjusting the checkerlib and the scoreboard

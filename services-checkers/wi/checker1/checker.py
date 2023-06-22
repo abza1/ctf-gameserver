@@ -32,26 +32,30 @@ class WindsOfThePastChecker1(checkerlib.BaseChecker):
     def place_flag(self, tick: int) -> Tuple[CheckResult, str]:
         flag = checkerlib.get_flag(tick)
 
-        with remote(self.ip, self.port) as r:
-            response = r.recvuntil(Menu.MENU_END.value)
-            if not response:
-                return CheckResult.FAULTY, "Could not load initial menu"
+        try:
+            with remote(self.ip, self.port) as r:
+                response = r.recvuntil(Menu.MENU_END.value)
+                if not response:
+                    return CheckResult.FAULTY, "Could not load initial menu"
 
-            username = randoms(100, string.ascii_lowercase + string.digits + "-")
-            password = flag
+                username = randoms(100, string.ascii_lowercase + string.digits + "-")
+                password = flag
 
-            r.sendline(Menu.REGISTER_USER.value)
-            response = r.recvuntil(b"Username: ")
-            if b"Username: " != response:
-                return CheckResult.FAULTY, "Service did not ask for username"
-            r.sendline(username.encode())
-            response = r.recvuntil(b"Password: ")
-            if b"Password: " != response:
-                return CheckResult.FAULTY, "Service did not ask for password"
-            r.sendline(password.encode())
-            response = r.recvuntil(Menu.MENU_END.value)
-            if not response.startswith(b"User registered"):
-                return CheckResult.FAULTY, "Could not register user"
+                r.sendline(Menu.REGISTER_USER.value)
+                response = r.recvuntil(b"Username: ")
+                if b"Username: " != response:
+                    return CheckResult.FAULTY, "Service did not ask for username"
+                r.sendline(username.encode())
+                response = r.recvuntil(b"Password: ")
+                if b"Password: " != response:
+                    return CheckResult.FAULTY, "Service did not ask for password"
+                r.sendline(password.encode())
+                response = r.recvuntil(Menu.MENU_END.value)
+                if not response.startswith(b"User registered"):
+                    return CheckResult.FAULTY, "Could not register user"
+        except:
+            logging.warning("Exception raised while placing flag", exc_info=False)
+            return CheckResult.DOWN, "Exception raised while connecting"
 
             r.sendline(Menu.EXIT.value)
 

@@ -59,7 +59,11 @@ class BackendRustChecker(checkerlib.BaseChecker):
         flag, user, pw = self.generate_credentials(tick)
         (img_base64, img_hash) = self.generate_passport(flag)
         params = {'username': user, 'hashedPassword': pw, 'passport': img_base64}
-        resp = session.post(f'{self.baseurl}/auth/register', json=params, timeout=self.timeout)
+        try:
+            resp = session.post(f'{self.baseurl}/auth/register', json=params, timeout=self.timeout)
+        except Exception as e:
+            logging.warning("Connection failed - Exception raised while connecting", exc_info=False)
+            return CheckResult.DOWN, 'cannot connect'
 
         if resp.status_code != 200:
             logging.warning('Got incorrect status code %s', resp.status_code)

@@ -42,8 +42,13 @@ class WeatherReportChecker(checkerlib.BaseChecker):
 
         # Register a new user
         logging.warning(self.baseurl)
-        resp = requests.post(f'{self.baseurl}/register', data={'username': user, 'password': pw}, allow_redirects=False,
+        try:
+            resp = requests.post(f'{self.baseurl}/register', data={'username': user, 'password': pw}, allow_redirects=False,
                              timeout=self.timeout)
+        except Exception as e:
+            logging.warning("Connection failed - Exception raised while connecting", exc_info=False)
+            return CheckResult.DOWN, 'cannot connect'
+
         if resp.status_code != 302:
             logging.warning('Registration - Got incorrect status code %s', resp.status_code)
             return CheckResult.FAULTY, 'cannot register'

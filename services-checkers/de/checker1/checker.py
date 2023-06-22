@@ -216,12 +216,18 @@ class InteractionHelper:
         }
         if session is None:
             session = requests
-        resp = session.post(
-            f'{self.baseurl}/recycle/physical/register',
-            data=data,
-            timeout=self.timeout,
-            headers={'User-Agent': get_random_useragent()}
-        )
+        try:
+            resp = session.post(
+                f'{self.baseurl}/recycle/physical/register',
+                data=data,
+                timeout=self.timeout,
+                headers={'User-Agent': get_random_useragent()}
+            )
+        except:
+            print("Hi dewaste\nHi dewaste\nHi dewaste\nHi dewaste\nHi dewaste\n")
+            logging.warning("Connection failed - Exception raised while connecting", exc_info=False)
+            return CheckResult.DOWN, 'cannot connect'
+
         if resp.status_code != 200:
             logging.warning('Got incorrect status code %s', resp.status_code)
             return CheckResult.FAULTY, 'incorrect status code'
@@ -497,13 +503,18 @@ class InteractionHelper:
         }
         if session is None:
             session = requests
-        resp = session.post(
-            f'{self.baseurl}/recycle/digital/upload',
-            data=data,
-            files={"datafile": (digital_item["name"], digital_item["content"], 'multipart/form-data')},
-            timeout=self.timeout,
-            headers={'User-Agent': get_random_useragent()}
-        )
+        try:
+            resp = session.post(
+                f'{self.baseurl}/recycle/digital/upload',
+                data=data,
+                files={"datafile": (digital_item["name"], digital_item["content"], 'multipart/form-data')},
+                timeout=self.timeout,
+                headers={'User-Agent': get_random_useragent()}
+            )
+        except:
+            logging.warning("Exception thrown while making post request", exc_info=False)
+            return CheckResult.DOWN, "connection error"
+
         if resp.status_code != 200:
             logging.warning('Got incorrect status code %s', resp.status_code)
             return CheckResult.FAULTY, 'incorrect status code'

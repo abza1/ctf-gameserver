@@ -70,7 +70,7 @@ class ExceptionContext:
                 return func(*args, **kwargs)
             except Exception as e:
                 if self._toplevel:
-                    logging.exception(self._comment)
+                    logging.warning(self._comment, exc_info=False)
                     if isinstance(e, CheckerExit):
                         return e.result, e.comment
                     return self._result, self._comment
