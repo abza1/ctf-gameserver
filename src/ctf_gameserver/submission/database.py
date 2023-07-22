@@ -75,6 +75,11 @@ def add_capture(db_conn, flag_id, capturing_team_net_no, prohibit_changes=False,
             result = (fake_tick,)
         tick = result[0]
 
+        #cursor.execute('SELECT protecting_team_id FROM scoring_flag where flag_id = %s',(flag_id,))
+        #result = cursor.fetchone()
+        #protecting_team_id = result[0]
+
+
         try:
             cursor.execute('INSERT INTO scoring_capture (flag_id, capturing_team_id, timestamp, tick)'
                            '    VALUES (%s, %s, NOW(), %s)', (flag_id, capturing_team_id, tick))

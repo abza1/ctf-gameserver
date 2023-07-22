@@ -224,7 +224,6 @@ class InteractionHelper:
                 headers={'User-Agent': get_random_useragent()}
             )
         except:
-            print("Hi dewaste\nHi dewaste\nHi dewaste\nHi dewaste\nHi dewaste\n")
             logging.warning("Connection failed - Exception raised while connecting", exc_info=False)
             return CheckResult.DOWN, 'cannot connect'
 

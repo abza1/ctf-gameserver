@@ -3,7 +3,6 @@
 
 -- #### flag points MATERIALIZED VIEW #####
 
-DROP MATERIALIZED VIEW IF EXISTS "scoreboard_v2_board";
 DROP MATERIALIZED VIEW IF EXISTS "scoreboard_v2_flag_points";
 
 -- calculates for each flag:
@@ -29,16 +28,62 @@ WITH
            SUM(captures) over(PARTITION BY flag_id ORDER BY tick) as all_captures
     FROM captures_per_tick
   ),
+  -- Calculate the rank of each team based on their current score at the specific tick
+  team_ranks AS (
+    select team_id,
+           tick + 1 AS tick, -- adding 1 because score calculation needs ranks from the previous ticks
+           SUM(attack+defense+sla) AS total,
+           dense_rank() OVER(partition by tick order by sum(attack+defense+sla) DESC) AS rank 
+    from scoreboard_v2_board 
+    group by team_id, tick order by tick DESC
+  ),
+
+  -- Calculate the rank difference between the attacker's team and the victim's team for each attack
+  rank_difference AS (
+    SELECT scoring_capture.tick,
+           scoring_capture.flag_id AS flag_id,
+           capturing_team_id AS attacker_team_id,
+           tr_a.rank AS attacker_rank,
+           scoring_flag.protecting_team_id AS victim_team_id,
+           tr_p.rank AS victim_rank,
+           tr_a.rank - tr_p.rank AS rank_diff
+    FROM scoring_capture
+    INNER JOIN scoring_flag ON scoring_capture.flag_id = scoring_flag.id
+    INNER JOIN team_ranks tr_a ON scoring_capture.capturing_team_id = tr_a.team_id AND scoring_capture.tick = tr_a.tick
+    INNER JOIN team_ranks tr_p ON scoring_flag.protecting_team_id = tr_p.team_id AND scoring_capture.tick = tr_p.tick
+  ),
+
+  -- Calculate the attack bonus for each flag based on the rank difference
   flag_points_per_tick AS (
+    SELECT all_captures_of_flag.tick,
+           all_captures_of_flag.flag_id,
+           all_captures,
+           attacker_team_id,
+           attacker_rank,
+           victim_team_id,
+           victim_rank,
+           rank_diff,
+           CASE 
+             WHEN all_captures_of_flag.tick = 0 OR rank_diff = 0 THEN (float8 '1.0' / all_captures) + float8 '1.0'  -- Handle tick 0 separately
+             ELSE (float8 '1.0' / all_captures) + (float8 '0.1' * rank_diff)
+           END AS attack_bonus,
+           POWER(all_captures, float8 '0.75') AS defense
+           -- Calculate the modified attack bonus based on the rank difference
+    FROM all_captures_of_flag
+    -- Join with rank_difference to get the rank difference for each flag capture
+    LEFT JOIN rank_difference ON all_captures_of_flag.tick = rank_difference.tick AND all_captures_of_flag.flag_id = rank_difference.flag_id
+    order by tick, flag_id
+  ),
+ -- flag_points_per_tick AS (
     -- calculate:
     -- the attack bonus (1 / count(all_captures_of[flag]) and
     -- the defense points (count(all_captures_of[flag]) ** 0.75)
     -- per tick and flag
-    SELECT tick, flag_id,
-           float8 '1.0' / all_captures as attack_bonus,
-           POWER(all_captures, float8 '0.75') as defense
-    FROM all_captures_of_flag
-  ),
+   -- SELECT tick, flag_id,
+     --      float8 '1.0' / all_captures as attack_bonus,
+       --    POWER(all_captures, float8 '0.75') as defense
+    --FROM all_captures_of_flag
+  --),
   flag_points_development AS (
     -- convert the value per tick to a difference to the previous tick's value
     -- We do this so we can add up the points in the recurisve CTE
@@ -55,17 +100,61 @@ WITH
   )
 SELECT flag_points_development.tick,
        flag_id,
-       scoring_service.service_group_id as service_group_id,
-       attack_bonus, attack_bonus_delta, defense_delta
+       scoring_service.service_group_id AS service_group_id,
+       attack_bonus,  -- Use the modified attack bonus
+       attack_bonus_delta,
+       defense_delta
 FROM flag_points_development
 INNER JOIN scoring_flag ON scoring_flag.id = flag_id
 INNER JOIN scoring_service ON scoring_service.id = service_id;
+--SELECT flag_points_development.tick,
+--       flag_id,
+--       scoring_service.service_group_id as service_group_id,
+--       attack_bonus, attack_bonus_delta, defense_delta
+--FROM flag_points_development
+--INNER JOIN scoring_flag ON scoring_flag.id = flag_id
+--INNER JOIN scoring_service ON scoring_service.id = service_id;
 
 CREATE INDEX flag_points_per_tick
   ON "scoreboard_v2_flag_points" (tick, flag_id, service_group_id, attack_bonus, attack_bonus_delta, defense_delta);
 
+
+
+
 -- ALTER MATERIALIZED VIEW "scoreboard_v2_flag_points" OWNER TO gameserver_controller;
 -- GRANT SELECT on TABLE "scoreboard_v2_flag_points" TO gameserver_web;
+
+
+--### rankings materialized view
+--DROP MATERIALIZED VIEW IF EXISTS "scoreboard_v2_board_with_rankings";
+---- This is an extension of the previous "scoreboard_v2_board" materialized view
+---- Now includes team rankings for each tick based on their scores
+--
+--CREATE MATERIALIZED VIEW "scoreboard_v2_board_with_rankings" AS
+--WITH RECURSIVE
+--  -- ... (The existing CTEs from the original "scoreboard_v2_board" materialized view go here) ...
+--  -- (You can keep all the existing CTEs from the original "scoreboard_v2_board" materialized view unchanged)
+--  -- Calculate team rankings for each tick
+--  rankings AS (
+--    SELECT
+--      tick,
+--      team_id,
+--      RANK() OVER (PARTITION BY tick ORDER BY (attack + defense + sla) DESC) AS ranking
+--    FROM scoreboard_v2_board
+--  )
+--SELECT
+--  b.tick,
+--  b.team_id,
+--  b.flags_captured,
+--  b.attack,
+--  b.flags_lost,
+--  b.defense,
+--  b.sla,
+--  r.ranking
+--FROM scoreboard_v2_board b
+--JOIN rankings r ON b.tick = r.tick AND b.team_id = r.team_id
+--ORDER BY b.tick, r.ranking;
+
 
 
 -- #### scoreboard MATERIALIZED VIEW ####
@@ -308,13 +397,57 @@ NATURAL FULL OUTER JOIN (SELECT * FROM flags_lost ORDER BY tick) AS flags_lost
 NATURAL FULL OUTER JOIN (SELECT * FROM defense ORDER BY tick) AS defense
 NATURAL FULL OUTER JOIN (SELECT * FROM sla ORDER BY tick) AS sla
 -- filter out -1 tick and larger ticks
-WHERE tick >= 0 AND tick <= (SELECT * FROM max_scoreboard_tick);
+WHERE tick >= -1 AND tick <= (SELECT * FROM max_scoreboard_tick);
 
 CREATE UNIQUE INDEX unique_per_tick
   ON "scoreboard_v2_board" (tick, team_id, service_group_id);
 
 -- ALTER MATERIALIZED VIEW "scoreboard_v2_board" OWNER TO gameserver_controller;
 -- GRANT SELECT on TABLE "scoreboard_v2_board" TO gameserver_web;
+
+
+
+-- ## team rankings materialized view ####
+--DROP TABLE IF EXISTS "scoreboard_v2_team_rankings";
+--DROP MATERIALIZED VIEW IF EXISTS "scoreboard_v2_team_rankings";
+--
+---- This makes heavy use of RECURSIVE CTEs:
+---- https://www.postgresql.org/docs/14/queries-with.html#QUERIES-WITH-RECURSIVE
+---- We do this to calculate the score based on the previous tick
+--
+--CREATE MATERIALIZED VIEW "scoreboard_v2_team_rankings" AS
+--WITH RECURSIVE
+--  -- calculate the max tick of the scoreboard.
+--  -- Normally this is current_tick - 1 because the current_tick is running and thus does not have final scoring
+--  -- However on game end we want the scoreboard to include the current_tick==last tick as current_tick is not incremented on game end
+--  max_scoreboard_tick AS (
+--    SELECT CASE WHEN (
+--      -- Check if the game is still running
+--      -- Use a slack of 1 sec to avoid time sync issues
+--      SELECT ("end" - INTERVAL '1 sec') > NOW() FROM scoring_gamecontrol
+--    ) THEN (
+--      -- game is running - avoid current_tick
+--      SELECT current_tick - 1 FROM scoring_gamecontrol 
+--    ) ELSE (
+--      -- game ended - include current_tick
+--      SELECT current_tick from scoring_gamecontrol
+--    ) END
+--  ),
+--  last_teams_rankings AS (
+--    SELECT dense_rank() OVER(order by total DESC) AS rank, team_id, tick, total from
+--    (select team_id, tick, SUM(attack+defense+sla) AS total from scoreboard_v2_board 
+--    WHERE tick >= -1 AND tick <= (SELECT * FROM max_scoreboard_tick) GROUP BY
+--    team_id, tick ORDER BY total DESC)
+--    AS subquery
+--  )
+--SELECT team_id, tick, rank, total
+--FROM last_teams_rankings;
+---- filter out -1 tick and larger ticks
+----WHERE tick >= -1 AND tick <= (SELECT * FROM max_scoreboard_tick);
+--
+--CREATE UNIQUE INDEX rankings_unique_per_tick
+--  ON "scoreboard_v2_team_rankings" (tick, team_id);
+
 
 -- #### first_bloods VIEW ####
 

@@ -58,6 +58,7 @@ def update_scoring(db_conn):
         try:
             cursor.execute('REFRESH MATERIALIZED VIEW "scoreboard_v2_flag_points"')
             cursor.execute('REFRESH MATERIALIZED VIEW CONCURRENTLY "scoreboard_v2_board"')
+            #cursor.execute('REFRESH MATERIALIZED VIEW "scoreboard_v2_board_with_rankings"')
         except Exception as e:    # noqa, pylint: disable=broad-except
             # don't crash controller on problems with the new scoreboard
             logging.warning("Failed to update scorebard_v2: %s", e)
