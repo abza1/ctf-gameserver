@@ -2,37 +2,37 @@
 competition_name: "ECSC 2022 | Attack-Defense"
 # dates in UTC, Vienna local time is 2h later
 services_public: '2022-09-04 19:00:00+00' # TODO change
-event_start:     '2023-07-22 13:15:00+00' # TODO change
+event_start:     '2023-07-22 14:08:00+00' # TODO change
 event_freeze:    '2023-08-22 07:52:00+00'
 event_end:       '2023-09-18 19:59:00+00'
 tick_duration: 60 # TODO change
 valid_ticks: 5 # NOTE: changing this value also requires adjusting the checkerlib and the scoreboard
-flag_prefix: 'ECSC_'
+flag_prefix: 'DREAM_'
 
 gamedb_host: gameserver-postgres
 pgpassword: 9iyzXY6pMYzRvXZi
 
 game_servicegroups:
-- {id: 1, name: "aquaeductus", slug: "service1"}
-- {id: 2, name: "blinkygram", slug: "service2"}
-- {id: 3, name: "cantina", slug: "service3"}
-- {id: 4, name: "dewaste", slug: "service4"}
+#- {id: 1, name: "aquaeductus", slug: "service1"}
+#- {id: 2, name: "blinkygram", slug: "service2"}
+- {id: 1, name: "cantina", slug: "service3"}
+#- {id: 1, name: "dewaste", slug: "service4"}
 #- {id: 5, name: "hps", slug: "service5"}
 #- {id: 6, name: "techbay", slug: "service6"}
 #- {id: 7, name: "winds-of-the-past", slug: "service7"}
 
 game_services:
-- {id:  1, group: 1, name: "Service 1 Checker 1", slug: "aquaeductus_checker1"}
+#- {id:  1, group: 1, name: "Service 1 Checker 1", slug: "aquaeductus_checker1"}
 
-- {id:  2, group: 2, name: "Service 2 Checker 1", slug: "blinkygram_checker1"}
+#- {id:  2, group: 2, name: "Service 2 Checker 1", slug: "blinkygram_checker1"}
 #- {id:  3, group: 2, name: "Service 2 Checker 2", slug: "blinkygram_checker2"}
 #- {id:  4, group: 2, name: "Service 2 Checker 3", slug: "service2_checker3"}
 
-- {id:  3, group: 3, name: "Service 3 Checker 1", slug: "cantina_checker1"}
+- {id: 1, group: 1, name: "Service 3 Checker 1", slug: "cantina_checker1"}
 #- {id:  6, group: 3, name: "Service 3 Checker 2", slug: "service3_checker2"}
 #- {id:  7, group: 3, name: "Service 3 Checker 3", slug: "service3_checker3"}
 
-- {id:  4, group: 4, name: "Service 4 Checker 1", slug: "dewaste_checker1"}
+#- {id:  4, group: 4, name: "Service 4 Checker 1", slug: "dewaste_checker1"}
 #- {id:  9, group: 4, name: "Service 4 Checker 2", slug: "service4_checker2"}
 
 #- {id: 6, group: 5, name: "Service 5 Checker 1", slug: "hps_checker1"}

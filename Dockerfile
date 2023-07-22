@@ -14,7 +14,7 @@ ADD conf/web/prod_settings.py /etc/ctf-gameserver/web/
 ADD doc/controller/scoring.sql /scoring.sql
 ADD doc/controller/scoreboard_v2.sql /scoreboard_v2.sql
 # variable set in docker-compose.yaml takes precedence over this
-ENV CTF_IPPATTERN=172.16.%s.62 
+ENV CTF_IPPATTERN=172.16.%s.1
 EXPOSE 5000
 CMD uwsgi --http-socket 0.0.0.0:5000 --module ctf_gameserver.web.wsgi \
         --python-path=/etc/ctf-gameserver/web \
